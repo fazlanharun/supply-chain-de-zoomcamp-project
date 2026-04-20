@@ -75,15 +75,8 @@ This project solves the **"Invisibility in Operations"** problem by implementing
 
 ---
 
-### 2. AWS Infrastructure Setup
-
-1.  **Create S3 Buckets:**
-    * `fazlan-supply-chain-lake-v3`: For storing **Bronze**, **Silver**, and **Gold** data layers.
-    * `fazlan-athena-results-v3`: For storing **Athena query results**.
-2.  **Configure Athena Workgroup:**
-    * Navigate to **Athena > Workgroups > primary**.
-    * Select **Edit** and set the **Query result location** to `s3://fazlan-athena-results-v3/`.
-3.  **IAM:**
+### 2. AWS Access
+  **IAM:**
     * Create IAM user with `AdministratorAccess`..
     * Generate and save the **Access Key ID** and **Secret Access Key**.
 
@@ -92,33 +85,74 @@ This project solves the **"Invisibility in Operations"** problem by implementing
 ### 3. Environment Configuration
 
 ```bash
-cd terraform
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your AWS region and unique bucket names
-terraform init
-terraform apply -auto-approve
-cd ..
-
-Create a `.env` file in the root directory to store your credentials safely:
-
-```bash
+git clone https://github.com/fazlanharun/supply-chain-de-zoomcamp-project.git
+cd supply-chain-de-zoomcamp-project
 cp .env.example .env
 # Open .env and fill in your AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION, BUCKET_NAME.
+```
 
-### . Provision Infrastructure with Terraform
- 
-```bash
+### 4. Provision Infrastructure with Terraform
+ ```bash
 cd terraform
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your AWS region and unique bucket names
 terraform init
 terraform apply -auto-approve
+```
+
+### 5. Download data from Kaggle and extract zip file
+ ```bash
 cd ..
+mkdir data
+curl -L -o ~/Downloads/supply-chain-de-zoomcamp-project/data/dataco-smart-supply-chain-for-big-data-analysis.zip  https://www.kaggle.com/api/v1/datasets/download/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
+cd data
+unzip dataco-smart-supply-chain-for-big-data-analysis.zip
+mv DataCoSupplyChainDataset.csv supply_chain_data.csv
+rm dataco-smart-supply-chain-for-big-data-analysis.zip
+```
 
+### 5. Ingest data using Airflow in Docker
+ ```bash
+cd ..
 docker-compose up -d
-Open Airflow UI at http://localhost:8080 (Default Credentials: airflow / airflow).
+Open Airflow UI at http://localhost:8082 (Default Credentials: admin / admin123).
+Trigger the "manual_to_s3_v1" DAG manually.
+Verify that raw supply_chain_data.csv files appear in your S3 fazlan-supply-chain-lake-v3/raw folder.
+```
 
-Trigger the supply_chain_ingestion DAG manually.
+### 6. Tranform raw data in AWS using dbt in Docker. 
+ ```bash
+docker-compose exec dbt dbt debug
+docker-compose exec dbt dbt run
+```
 
-Verify that raw .csv files appear in your S3 Bronze folder.
+### 7. Query slivel, gold data in AWS using Amazon Athena
+Open AWS Console, find service Athena.
+Find database supply_chain_data_final that contain raw data.
+Find database silver_db that contain silver and gold table named stg_orders,fct_sales_performance respectively.
+
+Run simple query below to inspect the data:
+
+```SQL
+SELECT * FROM fct_sales_performance LIMIT 10;
+```
+### 8. Connecting to PowerBI
+1.  **Configure Athena Workgroup:**
+    * Navigate to **Athena > Workgroups > primary**.
+    * Select **Edit** and set the **Query result location** to `s3://fazlan-athena-results-v3/`.
+  
+2. Download Amazon Athena OBDC Driver at https://docs.aws.amazon.com/athena/latest/ug/odbc-v2-driver.html. Install as usual.
+3. Open ODBC. Ssystem DSN, choose Amazon Athena, Finish. In configuration pane. Give Data Source name eg (AWS Athena Fazlan). Region : ap-southeast-1.
+4. Click authentication option at below. Authentication type : IAM Credentials. Usernama is AWS Access Key, Password is AWS Secret Key. Click ok.
+5. Click test connection. It should display successfully connected to.
+
+Successfully connected to: Athena engine version 3
+
+Region: ap-southeast-1
+Catalog: AwsDataCatalog
+Workgroup: primary
+Auth Type: IAM Credentials
+Click ok,ok,ok to close the dialog box.
+6.Open PowerBI and Get Data -> ODBC -> Choose DSN that we created earlier eg (AWS Athena Fazlan). Click default or custom. 
+7. You are successfully connected. You in the Powr BI get data pane with access to all three table, bronze_orders, stg_orders and fcst_sales_performance.
+8. fcst_sales_performance is the table used to create the PowerBI dashboard.
+
 
