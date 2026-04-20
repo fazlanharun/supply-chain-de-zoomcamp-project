@@ -83,16 +83,42 @@ This project solves the **"Invisibility in Operations"** problem by implementing
 2.  **Configure Athena Workgroup:**
     * Navigate to **Athena > Workgroups > primary**.
     * Select **Edit** and set the **Query result location** to `s3://fazlan-athena-results-v3/`.
-3.  **IAM Service Account:**
-    * Create a user with `AmazonS3FullAccess`, `AmazonAthenaFullAccess`, and `AWSGlueConsoleFullAccess`.
+3.  **IAM:**
+    * Create IAM user with `AdministratorAccess`..
     * Generate and save the **Access Key ID** and **Secret Access Key**.
 
 ---
 
 ### 3. Environment Configuration
 
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your AWS region and unique bucket names
+terraform init
+terraform apply -auto-approve
+cd ..
+
 Create a `.env` file in the root directory to store your credentials safely:
 
 ```bash
 cp .env.example .env
 # Open .env and fill in your AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION, BUCKET_NAME.
+
+### . Provision Infrastructure with Terraform
+ 
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your AWS region and unique bucket names
+terraform init
+terraform apply -auto-approve
+cd ..
+
+docker-compose up -d
+Open Airflow UI at http://localhost:8080 (Default Credentials: airflow / airflow).
+
+Trigger the supply_chain_ingestion DAG manually.
+
+Verify that raw .csv files appear in your S3 Bronze folder.
+
