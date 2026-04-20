@@ -150,9 +150,12 @@ Region: ap-southeast-1
 Catalog: AwsDataCatalog  
 Workgroup: primary  
 Auth Type: IAM Credentials  
-Click ok,ok,ok to close the dialog box.  
-6.Open PowerBI and Get Data -> ODBC -> Choose DSN that we created earlier eg (AWS Athena Fazlan). Click default or custom.   
-7. You are successfully connected. You in the Powr BI get data pane with access to all three table, bronze_orders, stg_orders and fcst_sales_performance.  
+Click ok,ok,ok to close the dialog box. 
+
+6.Open PowerBI and Get Data -> ODBC -> Choose DSN that we created earlier eg (AWS Athena Fazlan). Click default or custom. 
+
+7. You are successfully connected. You in the Powr BI get data pane with access to all three table, bronze_orders, stg_orders and fcst_sales_performance.
+
 8. fcst_sales_performance is the table used to create the PowerBI dashboard.
 
 
