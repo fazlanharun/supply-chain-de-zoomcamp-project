@@ -124,7 +124,7 @@ docker-compose exec dbt dbt debug
 docker-compose exec dbt dbt run
 ```
 
-### 7. Query slivel, gold data in AWS using Amazon Athena
+### 7. Query silver, gold data in AWS using Amazon Athena
 Open AWS Console, find service Athena.
 Find database supply_chain_data_final that contain raw data.
 Find database silver_db that contain silver and gold table named stg_orders,fct_sales_performance respectively.
@@ -146,13 +146,13 @@ SELECT * FROM fct_sales_performance LIMIT 10;
 
 Successfully connected to: Athena engine version 3
 
-Region: ap-southeast-1
-Catalog: AwsDataCatalog
-Workgroup: primary
-Auth Type: IAM Credentials
-Click ok,ok,ok to close the dialog box.
-6.Open PowerBI and Get Data -> ODBC -> Choose DSN that we created earlier eg (AWS Athena Fazlan). Click default or custom. 
-7. You are successfully connected. You in the Powr BI get data pane with access to all three table, bronze_orders, stg_orders and fcst_sales_performance.
+Region: ap-southeast-1   
+Catalog: AwsDataCatalog  
+Workgroup: primary  
+Auth Type: IAM Credentials  
+Click ok,ok,ok to close the dialog box.  
+6.Open PowerBI and Get Data -> ODBC -> Choose DSN that we created earlier eg (AWS Athena Fazlan). Click default or custom.   
+7. You are successfully connected. You in the Powr BI get data pane with access to all three table, bronze_orders, stg_orders and fcst_sales_performance.  
 8. fcst_sales_performance is the table used to create the PowerBI dashboard.
 
 
