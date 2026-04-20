@@ -1,0 +1,11 @@
+#dbt need schema.yml to knwo bronze_orders exist in athena
+
+version: 2
+
+sources:
+  - name: supply_chain
+    database: awsdatacatalog
+    schema: supply_chain_data # Nama database kat Athena
+    tables:
+      - name: bronze_orders # Nama table yang kita buat kat Terraform
+

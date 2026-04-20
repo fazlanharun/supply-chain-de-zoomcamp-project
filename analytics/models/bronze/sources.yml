@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: external_source
+    database: awsdatacatalog
+    schema: supply_chain_data_final # Database name in Terraform/Glue
+    tables:
+      - name: bronze_orders # Table name in Terraform/Glue

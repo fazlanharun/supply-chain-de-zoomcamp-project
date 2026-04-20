@@ -1,0 +1,10 @@
+analytics:
+  outputs:
+    dev:
+      type: athena
+      s3_staging_dir: s3://fazlan-athena-results-v3/dbt_staging/
+      region_name: ap-southeast-1
+      database: awsdatacatalog
+      schema: silver_db
+      threads: 1
+  target: dev
