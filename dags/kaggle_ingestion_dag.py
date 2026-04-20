@@ -12,10 +12,10 @@ def upload_local_to_s3():
     
     # 2. Check if file exists
     if not os.path.exists(local_file):
-        raise FileNotFoundError(f"Mana file CSV? Tak jumpa kat: {local_file}")
+        raise FileNotFoundError(f"File is not found at: {local_file}")
     
     # 3. Upload to S3 (Logic: Local PC -> S3 Lake)
-    s3_hook = S3Hook(aws_conn_id=None) # Guna env variables
+    s3_hook = S3Hook(aws_conn_id=None) # 
     print(f"Uploading {local_file} to s3://{s3_bucket}/{s3_key}")
     
     s3_hook.load_file(
