@@ -1,20 +1,67 @@
 # Supply Chain End-to-End Data Pipeline (Medallion Architecture)
 
-## Problem Statement
-The current supply chain operational data is stored in disparate, raw CSV formats, making it difficult for stakeholders to analyze sales performance and operational efficiency in real-time. This project solves the "Invisibility in Operations" problem by implementing a structured Medallion Architecture. It transforms raw data into a high-performance Gold Layer (Analytics-ready), allowing business users to answer key questions:
--What is the monthly revenue trend? (Identifying seasonal growth)
--Which regions and product categories are most profitable? (Optimizing logistics)
+## 🎯 Problem Statement
+The current supply chain operational data is stored in disparate, raw CSV formats, making it difficult for stakeholders to analyze sales performance and operational efficiency in real-time. 
 
-## Architecture
-Data Pipeline Flow:
-Orchestration: Airflow (Dockerized) triggers the ingestion.
-Ingestion: Python scripts fetch raw CSVs and land them in AWS S3 (Bronze Layer).
-Schema Registry: AWS Glue Crawlers catalog the data.
-Transformation: dbt running on Athena transforms data:
-Bronze → Silver: Cleaning, casting types, and deduplication.
-Silver → Gold: Aggregating metrics and Partitioning by month for performance.
-Analytics: Power BI connects via ODBC to the Gold Layer.
+This project solves the **"Invisibility in Operations"** problem by implementing a structured **Medallion Architecture**. It transforms raw data into a high-performance **Gold Layer** (Analytics-ready), allowing business users to answer key questions:
 
+* **What is the monthly revenue trend?** (Identifying seasonal growth)
+* **Which regions and product categories are most profitable?** (Optimizing logistics)
+
+---
+
+## 🏗️ Architecture
+
+### Data Pipeline Flow
+1.  **Orchestration:** **Airflow (Dockerized)** triggers the ingestion.
+2.  **Ingestion:** Python scripts fetch raw CSVs and land them in **AWS S3 (Bronze Layer)**.
+3.  **Schema Registry:** **AWS Glue Crawlers** catalog the data.
+4.  **Transformation:** **dbt** running on **Athena** transforms data:
+    * **Bronze → Silver:** Cleaning, casting types, and deduplication.
+    * **Silver → Gold:** Aggregating metrics and **Partitioning by month** for performance.
+5.  **Analytics:** **Power BI** connects via **ODBC** to the Gold Layer.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Tool | Purpose |
+| :--- | :--- | :--- |
+| **Cloud Provider** | AWS | Hosting Infrastructure |
+| **Orchestration** | Apache Airflow | Workflow Scheduling |
+| **Data Lake** | AWS S3 | Storage (Bronze, Silver, Gold) |
+| **Data Warehouse** | AWS Athena | Serverless Query Engine |
+| **Cataloging** | AWS Glue | Metadata & Schema Registry |
+| **Transformation** | dbt | SQL Modeling & Lineage |
+| **Visualization** | Power BI | Business Intelligence Dashboard |
+
+---
+
+## 📂 Medallion Layers Logic
+
+### 🥉 Bronze Layer
+* **Source:** Raw CSV files.
+* **State:** Original, unaltered data.
+* **Format:** CSV.
+
+### 🥈 Silver Layer
+* **Process:** Handled by dbt staging models.
+* **Cleanup:** Data type casting  for consistency.
+* **Format:** Parquet.
+
+### 🥇 Gold Layer
+* **Process:** Handled by dbt models.
+* **Logic:** Aggregated sales metrics (Total Revenue, Profit Margin).
+* **Optimization:** **Partitioned by `order_month`** to reduce Athena scan costs and improve BI performance.
+* **Format:** Parquet.
+
+---
+
+## 📊 Dashboard Insights
+* **Tile 1 (Monthly Revenue):** Time-series analysis to monitor business growth.
+* **Tile 2 (Profitability Matrix):** Bar chart identifying high-margin categories and regions.
+
+<img width="1306" height="815" alt="supply chain de" src="https://github.com/user-attachments/assets/f9a2ae18-861f-46b6-8926-241da5c7b452" />
 
 
 ## How to Replicate This Project
@@ -36,7 +83,6 @@ Analytics: Power BI connects via ODBC to the Gold Layer.
 2.  **Configure Athena Workgroup:**
     * Navigate to **Athena > Workgroups > primary**.
     * Select **Edit** and set the **Query result location** to `s3://fazlan-athena-results-v3/`.
-    * **CRITICAL:** Check the box **"Enforce workgroup configuration"**. This ensures Power BI and dbt can execute queries without location errors.
 3.  **IAM Service Account:**
     * Create a user with `AmazonS3FullAccess`, `AmazonAthenaFullAccess`, and `AWSGlueConsoleFullAccess`.
     * Generate and save the **Access Key ID** and **Secret Access Key**.
@@ -49,4 +95,4 @@ Create a `.env` file in the root directory to store your credentials safely:
 
 ```bash
 cp .env.example .env
-# Open .env and fill in your AWS_ACCESS_KEY, AWS_SECRET_KEY, and BUCKET_NAME
+# Open .env and fill in your AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION, BUCKET_NAME.
